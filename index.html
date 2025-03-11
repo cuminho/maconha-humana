@@ -84,7 +84,6 @@
         <button onclick="addRow()">Adicionar Linha</button>
         <button onclick="addColumn()">Adicionar Coluna</button>
         <button class="rename-column-btn" onclick="renameColumn()">Renomear Colunas</button>
-        <button onclick="exportToMarkdown()">Exportar para Markdown</button>
     </div>
 
     <table id="databaseTable">
@@ -97,28 +96,55 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="editable"><input type="text" value="João"></td>
-                <td class="editable"><input type="number" value="30"></td>
-                <td class="editable"><input type="text" value="São Paulo"></td>
-                <td><button class="delete-btn" onclick="deleteRow(this)">Excluir</button></td>
-            </tr>
-            <tr>
-                <td class="editable"><input type="text" value="Maria"></td>
-                <td class="editable"><input type="number" value="25"></td>
-                <td class="editable"><input type="text" value="Rio de Janeiro"></td>
-                <td><button class="delete-btn" onclick="deleteRow(this)">Excluir</button></td>
-            </tr>
-            <tr>
-                <td class="editable"><input type="text" value="Pedro"></td>
-                <td class="editable"><input type="number" value="35"></td>
-                <td class="editable"><input type="text" value="Belo Horizonte"></td>
-                <td><button class="delete-btn" onclick="deleteRow(this)">Excluir</button></td>
-            </tr>
+            <!-- As linhas serão geradas dinamicamente a partir do LocalStorage -->
         </tbody>
     </table>
 
     <script>
+        // Função para carregar a tabela do LocalStorage
+        function loadTable() {
+            const storedData = localStorage.getItem('tableData');
+            if (storedData) {
+                const tableData = JSON.parse(storedData);
+                const table = document.getElementById('databaseTable').getElementsByTagName('tbody')[0];
+
+                tableData.forEach(rowData => {
+                    const newRow = table.insertRow();
+                    rowData.forEach((cellData, index) => {
+                        const newCell = newRow.insertCell(index);
+                        const input = document.createElement('input');
+                        input.type = (index === 1) ? 'number' : 'text';
+                        input.value = cellData;
+                        newCell.appendChild(input);
+                        newCell.classList.add('editable');
+                    });
+
+                    const deleteCell = newRow.insertCell(rowData.length);
+                    deleteCell.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Excluir</button>';
+                });
+            }
+        }
+
+        // Função para salvar a tabela no LocalStorage
+        function saveTable() {
+            const table = document.getElementById('databaseTable');
+            const rows = table.rows;
+            const tableData = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const rowData = [];
+                for (let j = 0; j < row.cells.length - 1; j++) {
+                    const cell = row.cells[j].querySelector("input");
+                    rowData.push(cell ? cell.value : row.cells[j].innerText);
+                }
+                tableData.push(rowData);
+            }
+
+            localStorage.setItem('tableData', JSON.stringify(tableData));
+        }
+
+        // Função para adicionar uma nova linha
         function addRow() {
             const table = document.getElementById('databaseTable').getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
@@ -136,8 +162,11 @@
             // Adiciona botão de excluir na nova linha
             const deleteCell = newRow.insertCell(numColumns);
             deleteCell.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Excluir</button>';
+
+            saveTable();  // Salva a tabela após a adição de uma linha
         }
 
+        // Função para adicionar uma nova coluna
         function addColumn() {
             const table = document.getElementById('databaseTable');
             const headerRow = table.rows[0];
@@ -154,8 +183,11 @@
                 newCell.appendChild(input);
                 newCell.classList.add('editable');
             }
+
+            saveTable();  // Salva a tabela após a adição de uma coluna
         }
 
+        // Função para renomear as colunas
         function renameColumn() {
             const columns = document.querySelectorAll('th:not(:last-child)');
             columns.forEach((column, index) => {
@@ -164,44 +196,22 @@
                     column.innerText = columnName.trim();
                 }
             });
+
+            saveTable();  // Salva a tabela após renomear as colunas
         }
 
+        // Função para excluir uma linha
         function deleteRow(button) {
             const row = button.parentNode.parentNode;
             row.parentNode.removeChild(row);
+            saveTable();  // Salva a tabela após excluir uma linha
         }
 
-        function exportToMarkdown() {
-            let table = document.getElementById("databaseTable");
-            let markdown = "";
+        // Carregar a tabela quando a página for carregada
+        window.onload = function() {
+            loadTable();
+        };
 
-            // Extrair cabeçalhos
-            let headers = [];
-            for (let i = 0; i < table.rows[0].cells.length - 1; i++) {
-                headers.push(table.rows[0].cells[i].innerText);
-            }
-            markdown += `| ${headers.join(" | ")} |\n`;
-            markdown += `| ${headers.map(() => "---").join(" | ")} |\n`;
-
-            // Extrair dados
-            for (let i = 1; i < table.rows.length; i++) {
-                let row = [];
-                for (let j = 0; j < table.rows[i].cells.length - 1; j++) {
-                    let cell = table.rows[i].cells[j].querySelector("input");
-                    row.push(cell ? cell.value : table.rows[i].cells[j].innerText);
-                }
-                markdown += `| ${row.join(" | ")} |\n`;
-            }
-
-            // Criar o arquivo para download
-            let blob = new Blob([markdown], { type: "text/markdown" });
-            let a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = "tabela.md";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
     </script>
 
 </body>
