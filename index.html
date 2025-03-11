@@ -131,10 +131,10 @@
             const rows = table.rows;
             const tableData = [];
 
-            for (let i = 1; i < rows.length; i++) {
+            for (let i = 1; i < rows.length; i++) { // Começa de 1 para ignorar o cabeçalho
                 const row = rows[i];
                 const rowData = [];
-                for (let j = 0; j < row.cells.length - 1; j++) {
+                for (let j = 0; j < row.cells.length - 1; j++) { // Exclui a coluna de ações
                     const cell = row.cells[j].querySelector("input");
                     rowData.push(cell ? cell.value : row.cells[j].innerText);
                 }
@@ -212,6 +212,8 @@
             loadTable();
         };
 
+        // Salvar a tabela sempre que houver qualquer alteração
+        document.addEventListener('input', saveTable);
     </script>
 
 </body>
