@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto Abigail</title>
+    <title>Jumpscare!</title>
     <style>
         /* Definir a imagem como fundo em tela cheia */
         body {
             margin: 0;
             padding: 0;
-            background: url('https://raw.githubusercontent.com/cuminho/tabela-teste/refs/heads/main/image.jpeg') no-repeat center center fixed;
+            background: url('imagem.jpeg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             display: flex;
@@ -21,16 +21,18 @@
 <body>
     <!-- Áudio escondido -->
     <audio id="jumpscare-audio">
-        <source src="https://github.com/cuminho/tabela-teste/blob/main/audio.mpeg" type="audio/mpeg">
+        <source src="https://raw.githubusercontent.com/cuminho/tabela-teste/main/audio.mpeg" type="audio/mpeg">
         Seu navegador não suporta áudio.
     </audio>
 
     <script>
-        // Toca o áudio assim que a página carregar
         window.onload = function() {
             const audio = document.getElementById("jumpscare-audio");
             audio.play().catch(error => {
-                console.log("Reprodução automática bloqueada pelo navegador. O usuário deve interagir primeiro.");
+                console.log("Reprodução automática bloqueada. O usuário precisa interagir.");
+                document.body.addEventListener("click", function() {
+                    audio.play();
+                });
             });
         };
     </script>
