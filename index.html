@@ -14,31 +14,59 @@
             height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
+            flex-direction: column;
+        }
+
+        /* Estilo para o botão */
+        #click-btn {
+            background-color: white;
+            color: #333;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 20px 40px;
+            border: 2px solid #333;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px; /* Ajuste o valor para o espaçamento */
+        }
+
+        /* Efeito ao passar o mouse */
+        #click-btn:hover {
+            background-color: #f1f1f1;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Efeito quando o botão é pressionado */
+        #click-btn:active {
+            transform: scale(1);
+            box-shadow: none;
         }
     </style>
 </head>
 <body>
+    <!-- Botão que inicia o áudio -->
+    <button id="click-btn" onclick="playAudio()">Clique aqui</button>
+
     <!-- Áudio escondido -->
-    <audio id="jumpscare-audio" autoplay muted>
+    <audio id="jumpscare-audio">
         <source src="https://raw.githubusercontent.com/cuminho/tabela-teste/main/audio.mpeg" type="audio/mpeg">
         Seu navegador não suporta áudio.
     </audio>
 
     <script>
-        window.onload = function() {
+        function playAudio() {
             const audio = document.getElementById("jumpscare-audio");
-
-            // Remover o mute e permitir a reprodução do áudio
-            audio.muted = false;
-
-            audio.play().catch(error => {
-                console.log("Reprodução automática bloqueada. O usuário precisa interagir.");
-                document.body.addEventListener("click", function() {
-                    audio.play();
-                });
+            audio.play().catch((error) => {
+                console.log("Reprodução automática bloqueada.");
             });
-        };
+
+            // Ocultar o botão após o clique
+            document.getElementById("click-btn").style.display = "none";
+        }
     </script>
 </body>
 </html>
