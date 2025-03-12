@@ -20,7 +20,7 @@
 </head>
 <body>
     <!-- Áudio escondido -->
-    <audio id="jumpscare-audio">
+    <audio id="jumpscare-audio" autoplay muted>
         <source src="https://raw.githubusercontent.com/cuminho/tabela-teste/main/audio.mpeg" type="audio/mpeg">
         Seu navegador não suporta áudio.
     </audio>
@@ -28,6 +28,10 @@
     <script>
         window.onload = function() {
             const audio = document.getElementById("jumpscare-audio");
+
+            // Remover o mute e permitir a reprodução do áudio
+            audio.muted = false;
+
             audio.play().catch(error => {
                 console.log("Reprodução automática bloqueada. O usuário precisa interagir.");
                 document.body.addEventListener("click", function() {
