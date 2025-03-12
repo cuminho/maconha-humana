@@ -1,220 +1,38 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela Editável</title>
+    <title>Jumpscare!</title>
     <style>
+        /* Definir a imagem como fundo em tela cheia */
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        .editable {
-            background-color: #f9f9f9;
-        }
-
-        input {
-            width: 100%;
-            border: none;
-            background-color: transparent;
-            text-align: left;
-        }
-
-        input:focus {
-            outline: none;
-        }
-
-        .button-container {
-            margin-bottom: 10px;
-        }
-
-        button {
-            padding: 8px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 5px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .rename-column-btn {
-            background-color: #2196F3;
-        }
-
-        .rename-column-btn:hover {
-            background-color: #1e88e5;
-        }
-
-        .delete-btn {
-            background-color: #f44336;
-        }
-
-        .delete-btn:hover {
-            background-color: #d32f2f;
+            margin: 0;
+            padding: 0;
+            background: url('imagem.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
 </head>
 <body>
-
-    <h1>Tabela de Banco de Dados Editável</h1>
-
-    <div class="button-container">
-        <button onclick="addRow()">Adicionar Linha</button>
-        <button onclick="addColumn()">Adicionar Coluna</button>
-        <button class="rename-column-btn" onclick="renameColumn()">Renomear Colunas</button>
-    </div>
-
-    <table id="databaseTable">
-        <thead>
-            <tr>
-                <th class="editable">Nome</th>
-                <th class="editable">Idade</th>
-                <th class="editable">Cidade</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- As linhas serão geradas dinamicamente a partir do LocalStorage -->
-        </tbody>
-    </table>
+    <!-- Áudio escondido -->
+    <audio id="jumpscare-audio">
+        <source src="audio.mpeg" type="audio/mpeg">
+        Seu navegador não suporta áudio.
+    </audio>
 
     <script>
-        // Função para carregar a tabela do LocalStorage
-        function loadTable() {
-            const storedData = localStorage.getItem('tableData');
-            if (storedData) {
-                const tableData = JSON.parse(storedData);
-                const table = document.getElementById('databaseTable').getElementsByTagName('tbody')[0];
-
-                tableData.forEach(rowData => {
-                    const newRow = table.insertRow();
-                    rowData.forEach((cellData, index) => {
-                        const newCell = newRow.insertCell(index);
-                        const input = document.createElement('input');
-                        input.type = (index === 1) ? 'number' : 'text';
-                        input.value = cellData;
-                        newCell.appendChild(input);
-                        newCell.classList.add('editable');
-                    });
-
-                    const deleteCell = newRow.insertCell(rowData.length);
-                    deleteCell.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Excluir</button>';
-                });
-            }
-        }
-
-        // Função para salvar a tabela no LocalStorage
-        function saveTable() {
-            const table = document.getElementById('databaseTable');
-            const rows = table.rows;
-            const tableData = [];
-
-            for (let i = 1; i < rows.length; i++) { // Começa de 1 para ignorar o cabeçalho
-                const row = rows[i];
-                const rowData = [];
-                for (let j = 0; j < row.cells.length - 1; j++) { // Exclui a coluna de ações
-                    const cell = row.cells[j].querySelector("input");
-                    rowData.push(cell ? cell.value : row.cells[j].innerText);
-                }
-                tableData.push(rowData);
-            }
-
-            localStorage.setItem('tableData', JSON.stringify(tableData));
-        }
-
-        // Função para adicionar uma nova linha
-        function addRow() {
-            const table = document.getElementById('databaseTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            const numColumns = document.getElementById('databaseTable').rows[0].cells.length - 1; // Exclui a coluna de "Ações"
-
-            for (let i = 0; i < numColumns; i++) {
-                const newCell = newRow.insertCell(i);
-                const input = document.createElement('input');
-                input.type = (i === 1) ? 'number' : 'text';
-                input.value = '';
-                newCell.appendChild(input);
-                newCell.classList.add('editable');
-            }
-
-            // Adiciona botão de excluir na nova linha
-            const deleteCell = newRow.insertCell(numColumns);
-            deleteCell.innerHTML = '<button class="delete-btn" onclick="deleteRow(this)">Excluir</button>';
-
-            saveTable();  // Salva a tabela após a adição de uma linha
-        }
-
-        // Função para adicionar uma nova coluna
-        function addColumn() {
-            const table = document.getElementById('databaseTable');
-            const headerRow = table.rows[0];
-            const newHeader = document.createElement('th');
-            newHeader.classList.add('editable');
-            newHeader.textContent = "Nova Coluna";
-            headerRow.insertBefore(newHeader, headerRow.lastElementChild);
-
-            for (let i = 1; i < table.rows.length; i++) {
-                const newCell = table.rows[i].insertCell(table.rows[i].cells.length - 1);
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = '';
-                newCell.appendChild(input);
-                newCell.classList.add('editable');
-            }
-
-            saveTable();  // Salva a tabela após a adição de uma coluna
-        }
-
-        // Função para renomear as colunas
-        function renameColumn() {
-            const columns = document.querySelectorAll('th:not(:last-child)');
-            columns.forEach((column, index) => {
-                const columnName = prompt(`Renomear a coluna "${column.innerText}" para:`, column.innerText);
-                if (columnName !== null && columnName.trim() !== '') {
-                    column.innerText = columnName.trim();
-                }
-            });
-
-            saveTable();  // Salva a tabela após renomear as colunas
-        }
-
-        // Função para excluir uma linha
-        function deleteRow(button) {
-            const row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
-            saveTable();  // Salva a tabela após excluir uma linha
-        }
-
-        // Carregar a tabela quando a página for carregada
+        // Toca o áudio assim que a página carregar
         window.onload = function() {
-            loadTable();
+            const audio = document.getElementById("jumpscare-audio");
+            audio.play().catch(error => {
+                console.log("Reprodução automática bloqueada pelo navegador. O usuário deve interagir primeiro.");
+            });
         };
-
-        // Salvar a tabela sempre que houver qualquer alteração
-        document.addEventListener('input', saveTable);
     </script>
-
 </body>
 </html>
